@@ -68,17 +68,22 @@ async function run() {
          * app.delete('/booking') // delete a booking
         */
 
+
+        app.get('/booking', async (req, res) => {
+            const patient = req.query.patient;
+            const query = { patient: patient };
+            const bookings = await bookingCollection.find(query).toArray();
+            res.send(bookings);
+        })
+
         app.post('/booking', async (req, res) => {
             const booking = req.body;
-            console.log(booking)
             const query = { treatment: booking.treatment, date: booking.date, patient: booking.patient };
             const exists = await bookingCollection.findOne(query);
-            console.log('exists', exists);
             if (exists) {
                 return res.send({ success: false, booking: exists })
             };
             const result = await bookingCollection.insertOne(booking);
-            console.log('result', result)
             return res.send({ success: true, result });
         });
     }
